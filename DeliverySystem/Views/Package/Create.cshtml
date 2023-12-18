@@ -1,0 +1,49 @@
+﻿@model Common.DTO.Package;
+
+@{
+    ViewData["Title"] = "Create";
+}
+<h1>Create</h1>
+<h4>Create Package</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <from asp-action =" reate">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="from-group">
+                <label asp-for="Name" class="control-label" 
+                ></label>
+                <label asp-for="Name" class="from-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+           
+            <div class="from-group">
+                <label asp-for="BarcodePackage" class="control-label"></label>
+                <label asp-for="BarcodePackage" class="from-control" />
+                <span asp-validation-for="BarcodePackage" class="text-danger"></span>
+            </div>
+
+            <div class="from-group">
+                <label asp-for="SentAddress" class="control-label"></label>
+                <label asp-for="SentAddress" class="from-control" />
+                <span asp-validation-for="SentAddress" class="text-danger"></span>
+            </div>
+
+            <div class="from-group">
+                <label asp-for="DestinationAddress" class="control-label"></label>
+                <label asp-for="DestinationAddress" class="from-control" />
+                <span asp-validation-for="DestinationAddress" class="text-danger"></span>
+            </div>
+        </from>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scrips {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

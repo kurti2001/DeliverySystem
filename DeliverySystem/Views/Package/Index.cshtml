@@ -1,0 +1,39 @@
+﻿@model IEnumerable<Common.DTO.Package>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>List Of Package</h1>
+<>
+<a asp-action="Create"> Create New</a>
+</>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.IdPackage)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.IdPackage
+                </td>
+                <td> 
+                    @Html.ActionLink("Edit","Edit", new {id=item.IdPackage})
+                    @Html.ActionLink("Details", "Details", new {id=item.IdPackage})
+                    @Html.ActionLink("Delete","Delete", new {id=item.IdPackage})
+                </td>
+            </tr>
+        }
+    </tbody>
+</table> 
