@@ -8,6 +8,7 @@ namespace DAL.Repositories
         void Add(Recepsionist recepsionist);
         Recepsionist GetById(int id);
         void DeleteById(int id);
+        IEnumerable<Recepsionist> GetAll();
     }
     internal class RecepsionistRepository: IRecepsionistRepository
     {
@@ -27,6 +28,10 @@ namespace DAL.Repositories
         public void DeleteById(int id) 
         {
             _dbSet.Remove(GetById(id));
+        }
+        public IEnumerable<Recepsionist> GetAll() 
+        {
+            return _dbSet.ToList();
         }
     }
 }

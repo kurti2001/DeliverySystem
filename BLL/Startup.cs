@@ -8,6 +8,7 @@ namespace BLL
         public static void RegisterBLLServices(this IServiceCollection services)
         {
             services.AddScoped<IPackageService, PackageService>();
+            services.AddScoped<IPostalOfficeService, PostalOfficeService>();
         }
     }
 }

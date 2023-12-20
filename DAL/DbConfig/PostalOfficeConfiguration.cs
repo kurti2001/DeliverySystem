@@ -14,9 +14,7 @@ namespace DAL.DbConfig
                 .IsRequired()
                 .HasMaxLength(12);
             builder.HasIndex(x => x.Location);
-            builder.Property(x => x.Address)
-                .HasMaxLength(500)
-                .IsRequired();
+            builder.HasIndex(x => x.Address);
             builder.Property(x => x.PhoneNumber)
                 .HasMaxLength(20)
                 .IsRequired();

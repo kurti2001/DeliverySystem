@@ -14,7 +14,6 @@ namespace BLL.Services
     internal class PackageService : IPackageService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly DbSet<Package> _dbSet;
         private static List<Package> _packages = new List<Package> ()
         {
             new Package { IdPackage=1, BarcodePackage=123456, Name = "FIRST Package", SentAddress = "St. Sent", DestinationAddress = "St. Dest" }
