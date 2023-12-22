@@ -1,6 +1,7 @@
 ﻿using DAL;
 using Common.DTO;
 using Microsoft.EntityFrameworkCore;
+
 namespace BLL.Services
 {
     public interface IPostalOfficeService
@@ -16,9 +17,6 @@ namespace BLL.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly DbSet<PostalOffice> _dbSet;
         private static List<PostalOffice> _postalOffice = new List<PostalOffice>();
-        //{
-        //    new PostalOffice { PostalOfficeId=1, OfficeName="Office NR1", Location = "Zone 1", Address = "St. Address", PhoneNumber = " 123"}
-        //};
         public PostalOfficeService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;

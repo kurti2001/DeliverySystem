@@ -10,6 +10,7 @@ namespace DAL.Repositories
         void DeleteById(int id);
         Package GetByBarcode(int barcode);
         void DeleteByBarcode(int barcode);
+        IEnumerable<Package> GetAll();
     }
 
     internal class PackageRepository: IPackageRepository
@@ -39,6 +40,11 @@ namespace DAL.Repositories
         public void DeleteByBarcode(int barcode)
         {
             _dbSet.Remove(GetByBarcode(barcode));
+        }
+
+        public IEnumerable<Package> GetAll()
+        {
+            return _dbSet.ToList();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace DAL.DbConfig
             builder.HasKey(x => x.PostalOfficeId);
             builder.Property(x => x.OfficeName)
                 .IsRequired()
-                .HasMaxLength(12);
+                .HasMaxLength(500);
             builder.HasIndex(x => x.Location);
             builder.HasIndex(x => x.Address);
             builder.Property(x => x.PhoneNumber)

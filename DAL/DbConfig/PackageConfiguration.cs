@@ -10,11 +10,11 @@ namespace DAL.DbConfig
         {
             builder.ToTable("Packages");
             builder.HasKey(x => x.IdPackage);
-            builder.Property(x => x.BarcodePackage)
+            builder.Property(x => x.Name)
                 .IsRequired()
-                .HasMaxLength(12);
-            builder.HasIndex(x => x.BarcodePackage)
-                .IsUnique();
+                .HasMaxLength(500);
+            builder.Property(x => x.BarcodePackage)
+                  .IsRequired();
             builder.Property( x => x.SentAddress)
                 .HasMaxLength(500)
                 .IsRequired();

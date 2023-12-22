@@ -13,6 +13,7 @@ namespace DAL.DbConfig
             builder.Property(x => x.Name)
                 .IsRequired()
                 .HasMaxLength(100);
+            builder.Property(x => x.Email);
             builder.HasIndex(x => x.PhoneNumber)
                 .IsUnique();
         }

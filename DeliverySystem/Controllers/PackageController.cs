@@ -1,8 +1,6 @@
 ﻿using BLL.Services;
 using Common.DTO;
-using DAL.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using DeliverySystem.Models;
 
 namespace DeliverySystem.Controllers
 {
@@ -19,6 +17,17 @@ namespace DeliverySystem.Controllers
         {
             return View(_packageService.GetAllPackages());
         }
+        [HttpGet]
+        public IActionResult GetById(int id)
+        {
+            var package = _packageService.GetById(id);
+            return View(package);
+        }
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
         [HttpPost]
         public IActionResult Create(PackageAddModel model) 
         { 
@@ -27,13 +36,13 @@ namespace DeliverySystem.Controllers
                 _packageService.Create(new Package
                 {
                     Name = model.Name,
+                    BarcodePackage = model.BarcodePackage,
+                    SentAddress = model.SentAddress,
+                    DestinationAddress = model.DestinationAddress
                 });
                 return RedirectToAction(nameof(Index));
             }
-            else 
-            {
                 return View(model);
-            }
         }
         [HttpGet]
         public IActionResult Edit(int id)
@@ -41,8 +50,26 @@ namespace DeliverySystem.Controllers
             var package = _packageService.GetById(id);
             return View(new PackageAddModel
             {
-                Name = package.Name
+                Name = package.Name,
+                BarcodePackage = package.BarcodePackage,
+                SentAddress = package.SentAddress,
+                DestinationAddress = package.DestinationAddress
             });
+        }
+        [HttpPost]
+        public IActionResult Edit(int id, PackageAddModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                _packageService.Update(id, model);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(model);
+        }
+        public IActionResult Details(int id)
+        {
+            var package = _packageService.GetById(id);
+            return View(package);
         }
         [HttpGet]
         public IActionResult Delete(int id)
@@ -53,7 +80,6 @@ namespace DeliverySystem.Controllers
         [HttpPost]
         public IActionResult ConfirmDelete(int id)
         {
-            var package = _packageService.GetById(id);
             _packageService.Delete(id);
             return RedirectToAction(nameof(Index));
         }

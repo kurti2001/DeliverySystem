@@ -80,5 +80,10 @@ namespace DeliverySystem.Controllers
             }
             return View(model);
         }
+        public IActionResult Details(int id)
+        {
+            var postalOffice = _postalOfficeService.GetById(id);
+            return View(postalOffice);
+        }
     }
 }

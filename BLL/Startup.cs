@@ -9,6 +9,7 @@ namespace BLL
         {
             services.AddScoped<IPackageService, PackageService>();
             services.AddScoped<IPostalOfficeService, PostalOfficeService>();
+            services.AddScoped<IRecepsionistService, RecepsionistService>();
         }
     }
 }

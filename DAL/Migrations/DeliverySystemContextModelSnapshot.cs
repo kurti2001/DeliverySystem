@@ -66,8 +66,7 @@ namespace DAL.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Location")
                         .IsRequired()
@@ -85,6 +84,8 @@ namespace DAL.Migrations
 
                     b.HasKey("PostalOfficeId");
 
+                    b.HasIndex("Address");
+
                     b.HasIndex("Location");
 
                     b.ToTable("PostalOffice", (string)null);
@@ -92,6 +93,9 @@ namespace DAL.Migrations
 
             modelBuilder.Entity("DAL.Entities.Recepsionist", b =>
                 {
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
@@ -107,7 +111,7 @@ namespace DAL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Email");
 
                     b.HasIndex("PhoneNumber")
                         .IsUnique();
