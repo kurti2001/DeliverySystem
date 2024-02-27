@@ -2,7 +2,57 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <label for="exampleFormControlInput1" class="form-label" style="font-size:x-large; margin-top:60px; color:white; font-weight:600">Track Your Shipment</label>
+            <form method="get" asp-controller="Packages" asp-action="FilterPackageView" class="form-inline">
+                <div class="input-group">
+                    <input class="form-control" type="text" name="q" placeholder="Search Barcode..." aria-label="Search">
+                    <div class="input-group-append">
+                        <button class="btn btn-danger" type="submit">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+
+<style>
+    body {
+        background-color: #f8f9fa; /* Light gray background */
+        background-image: url('/images/macepost1.jpg');
+        background-repeat: no-repeat;
+        background-size: cover; /* Cover the entire body */
+    }
+
+    .container {
+        margin-top: 50px;
+    }
+
+    .form-inline {
+        display: flex;
+        justify-content: center;
+    }
+
+    .input-group {
+        margin-top: 10px;
+    }
+
+    .form-control {
+        border-color: #dc3545; /* Red border color */
+        color: #495057; /* Dark text color */
+    }
+
+    .btn-danger {
+        color: #fff; /* White text color */
+        background-color: #dc3545; /* Red background color */
+        border-color: #dc3545; /* Red border color */
+    }
+
+        .btn-danger:hover {
+            color: #fff; /* White text color on hover */
+            background-color: #c82333; /* Slightly darker red background on hover */
+            border-color: #bd2130; /* Slightly darker red border on hover */
+        }
+</style>

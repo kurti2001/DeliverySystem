@@ -6,10 +6,10 @@ namespace DAL.DbConfig
 {
     internal class PostalOfficeConfiguration : IEntityTypeConfiguration<PostalOffice>
     {
-        public void Configure(EntityTypeBuilder<PostalOffice> builder) 
+        public void Configure(EntityTypeBuilder<PostalOffice> builder)
         {
-            builder.ToTable("PostalOffice");
-            builder.HasKey(x => x.PostalOfficeId);
+            builder.ToTable("PostalOffices");
+            builder.HasKey(x => x.Id);
             builder.Property(x => x.OfficeName)
                 .IsRequired()
                 .HasMaxLength(500);
@@ -18,6 +18,11 @@ namespace DAL.DbConfig
             builder.Property(x => x.PhoneNumber)
                 .HasMaxLength(20)
                 .IsRequired();
+
+            // Specify the navigation property instead of using HasOne<Area>()
+            builder.HasOne(p => p.Area)
+                   .WithMany(a => a.PostalOffices)
+                   .HasForeignKey(p => p.AreaId);
         }
     }
 }

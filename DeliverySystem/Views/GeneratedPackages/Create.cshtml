@@ -1,0 +1,109 @@
+﻿@using Common.DTO
+@model GeneratePackageModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="text-center mb-4">Make a Request</h2>
+                    <hr />
+                    <div id="successMessage" class="alert alert-success" style="display: none;">
+                        Package created successfully!
+                    </div>
+
+                    <form id="createPackageForm">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label">Name</label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="SenderInformation" class="control-label">Sender Information</label>
+                            <input asp-for="SenderInformation" class="form-control" />
+                            <span asp-validation-for="SenderInformation" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Email" class="control-label">Email</label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="SentAddress" class="control-label">Sent Address</label>
+                            <input asp-for="SentAddress" class="form-control" />
+                            <span asp-validation-for="SentAddress" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="SentZipCode" class="control-label">Sent Zip Code</label>
+                            <input asp-for="SentZipCode" class="form-control" />
+                            <span asp-validation-for="SentZipCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="DestinationAddress" class="control-label">Destination Address</label>
+                            <input asp-for="DestinationAddress" class="form-control" />
+                            <span asp-validation-for="DestinationAddress" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="DestinationZipCode" class="control-label">Destination Zip Code</label>
+                            <input asp-for="DestinationZipCode" class="form-control" />
+                            <span asp-validation-for="DestinationZipCode" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Weight" class="control-label">Weight</label>
+                            <input asp-for="Weight" class="form-control" />
+                            <span asp-validation-for="Weight" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mt-2">
+                            <button type="button" onclick="createPackage()" class="btn btn-primary btn-block">Create Package</button>
+
+                            <div class="form-group mt-2">
+                                <div class="btn-group" role="group">
+                                    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function createPackage() {
+        // Serialize form data
+        var formData = $('#createPackageForm').serialize();
+
+        // Submit form data asynchronously
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("Create", "GeneratedPackages")', // Adjust URL as needed
+            data: formData,
+            success: function (response) {
+                // Display success message
+                $('#successMessage').show();
+
+                // Optionally, reset the form or perform any other actions
+                $('#createPackageForm')[0].reset();
+            },
+            error: function (xhr, status, error) {
+                // Handle error if needed
+                console.error(xhr.responseText);
+            }
+        });
+    }
+</script>

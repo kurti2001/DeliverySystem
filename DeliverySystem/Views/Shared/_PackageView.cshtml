@@ -1,0 +1,82 @@
+﻿@using Common.DTO
+@using DAL.Entities
+
+@model PackageAddModel
+
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">@Model.Name</h5>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Sent Address:</strong> @Model.SentAddress</li>
+                <li class="list-group-item"><strong>Destination Address:</strong> @Model.DestinationAddress</li>
+                <li class="list-group-item"><strong>Barcode:</strong> @Model.BarcodePackage</li>
+                <li class="list-group-item"><strong>DestinationZipCode:</strong> @Model.DestinationZipCode</li>
+                <li class="list-group-item"><strong>Status:</strong> @Model.Status</li>
+            </ul>
+            @if (Model.Status == PackageStatus.Transported)
+            {
+                <div class="card-footer text-center">
+                    <form asp-controller="Packages" asp-action="AcceptPackage" method="post" style="display: inline;">
+                        <input type="hidden" name="packageId" value="@Model.Id" />
+                        <button type="submit" class="btn btn-success">Accept</button>
+                    </form>
+                    <form asp-controller="Packages" asp-action="DeclinePackage" method="post" style="display: inline;">
+                        <input type="hidden" name="packageId" value="@Model.Id" />
+                        <button type="submit" class="btn btn-danger">Decline</button>
+                    </form>
+                </div>
+            }
+
+        </div>
+
+        @if (User.IsInRole("Recepsionist"))
+        {
+            <div class="card-footer text-center">
+                <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Back</a>
+            </div>
+        }
+        @if (User.IsInRole("Transporter"))
+        {
+            <div class="card-footer text-center">
+                <form asp-controller="Packages" asp-action="CreateDelivery" method="post">
+                    <input type="hidden" name="packageId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-primary">
+                        Deliver Package
+                    </button>
+                </form>
+            </div>
+        }
+    </div>
+</div>
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("createDeliveryForm").addEventListener("submit", function (event) {
+                event.preventDefault();
+                var form = event.target;
+                var formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: form.method,
+                    body: formData
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data);
+                        window.location.href = "/home";
+                    })
+                    .catch(error => {
+                        console.error('There was an error!', error);
+                    });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,20 @@
+﻿<form method="get"
+      asp-controller="Packages"
+      asp-action="FilterPackageViewZip"
+      style="position: relative;">
+    <input type="text"
+           name="z"
+           placeholder="Search..."
+           id="txtSearchBoxQuery"
+           onkeyup="searchAsync()" />
+    <ul id="search-results">
+    </ul>
+</form>
+<style>
+    #search-results {
+        position: absolute;
+        top: 30px;
+        left: 0;
+        background: white;
+    }
+</style>

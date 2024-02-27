@@ -1,81 +1,55 @@
 ﻿using DAL;
-using Common.DTO;
+using DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BLL.Services
 {
-    public interface IPostalOfficeService
+    public interface IPostalOfficeService : IBaseService<PostalOffice, int>
     {
-        IEnumerable<PostalOffice> GetPostalOffices();
-        void Create(PostalOffice postalOffice);
-        void Delete(int id);
-        PostalOffice GetById(int id);
-        void Update(int id, AddPostalOfficeModel model);
+        Task<IEnumerable<PostalOffice>> GetPostalOffices();
+        Task<List<PostalOffice>> GetByAreaId(int areaId);
     }
-    public class PostalOfficeService : IPostalOfficeService
+
+    internal class PostalOfficeService : BaseService<PostalOffice, int>, IPostalOfficeService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly DbSet<PostalOffice> _dbSet;
-        private static List<PostalOffice> _postalOffice = new List<PostalOffice>();
-        public PostalOfficeService(IUnitOfWork unitOfWork)
+        private readonly IAreaService _areaService;
+
+        public PostalOfficeService(IUnitOfWork unitOfWork, IAreaService areaService) : base(unitOfWork)
         {
             _unitOfWork = unitOfWork;
+            _areaService = areaService;
         }
-        public IEnumerable<PostalOffice> GetPostalOffices() 
+
+        public async Task<List<PostalOffice>> GetByAreaId(int areaId)
         {
-            return _unitOfWork.PostalOfficeRepository.GetAll()
-            .Select(x => new PostalOffice
-             {
-                PostalOfficeId = x.PostalOfficeId,
+            var offices = await _unitOfWork.PostalOfficeRepository.GetByAreaId(areaId)
+                .ToListAsync();
+
+            return offices.Select(x => new PostalOffice
+            {
+                Id = x.Id,
+                OfficeName = x.OfficeName,
+                Location = x.Location,
+                Address = x.Address,
+                PhoneNumber = x.PhoneNumber,
+                AreaId = x.AreaId
+            }).ToList();
+        }
+
+
+
+        public async Task<IEnumerable<PostalOffice>> GetPostalOffices()
+        {
+            var offices = await _unitOfWork.PostalOfficeRepository.GetAll();
+            return offices.Select(x => new PostalOffice
+            {
+                Id = x.Id,
                 OfficeName = x.OfficeName,
                 Location = x.Location,
                 Address = x.Address,
                 PhoneNumber = x.PhoneNumber
-             }).ToList();
-        }
-        public void Create(PostalOffice postalOffice)
-        {
-            var existsPostalOffice = _unitOfWork.PostalOfficeRepository.GetByName(postalOffice.OfficeName);
-            if (existsPostalOffice != null)
-            {
-                throw new Exception("There is an existing Office by this name");
-            }
-            _unitOfWork.PostalOfficeRepository.Add(new DAL.Entities.PostalOffice
-            {
-                OfficeName = postalOffice.OfficeName,
-                Location = postalOffice.Location,
-                Address = postalOffice.Address,
-                PhoneNumber = postalOffice.PhoneNumber
             });
-            _unitOfWork.Commit();
-        }
-        public void Delete(int id)
-        {
-            _unitOfWork.PostalOfficeRepository.DeleteById(id);
-            _unitOfWork.Commit();
-        }
-        public PostalOffice GetById(int id)
-        {
-            var dbPostalOffice = _unitOfWork.PostalOfficeRepository.GetById(id) ?? throw new Exception("There is no PostOffice with this ID");
-            return new PostalOffice
-            {
-                PostalOfficeId= dbPostalOffice.PostalOfficeId,
-                OfficeName = dbPostalOffice.OfficeName,
-                Address = dbPostalOffice.Address,
-                Location= dbPostalOffice.Location,
-                PhoneNumber = dbPostalOffice.PhoneNumber
-                     
-            };
-        }
-
-        public void Update(int id, AddPostalOfficeModel model)
-        {
-            var postalOffice = _unitOfWork.PostalOfficeRepository.GetById(id);
-            postalOffice.OfficeName = model.OfficeName;
-            postalOffice.Location = model.Location;            
-            postalOffice.Address = model.Address;
-            postalOffice.PhoneNumber = model.PhoneNumber;
-            _unitOfWork.Commit();
         }
     }
 }

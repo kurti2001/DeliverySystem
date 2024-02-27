@@ -1,82 +1,171 @@
-﻿using DAL;
+﻿using AutoMapper;
 using Common.DTO;
-using Microsoft.EntityFrameworkCore;
+using Common.Exceptions;
+using DAL;
+using DAL.Entities;
 
 namespace BLL.Services
 {
-    public interface IPackageService
+    public interface IPackageService : IBaseService<Package, int>
     {
-        IEnumerable<Package> GetAllPackages();
-        void Create(Package package);
-        void Delete(int id);
-        Package GetById(int id);
-        void Update(int id, PackageAddModel model);
+        Task<IEnumerable<Package>> GetAllPackages();
+        Task<List<PackageAddModel>> GetPackageByBarcode(string barcode);
+        Task<List<PackageAddModel>> GetPackageByZipCode(string zipCode);
+        Task UpdatePackageStatusAsync(int packageId, PackageStatus status);
+        event PackageStatusChangedEventHandler PackageStatusChanged;
     }
-    internal class PackageService : IPackageService
+
+    public delegate void PackageStatusChangedEventHandler(Package updatedPackage);
+
+    internal class PackageService : BaseService<Package, int>, IPackageService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private static List<Package> _packages = new List<Package>();
-  
-        public PackageService(IUnitOfWork unitOfWork)
+        private readonly IEmailsService _emailsService;
+        private readonly IGeneratePackageService _generatePackageService;
+
+        public event PackageStatusChangedEventHandler PackageStatusChanged;
+
+        public PackageService(IUnitOfWork unitOfWork,
+                              IEmailsService emailsService,
+                              IGeneratePackageService generatePackageService) : base(unitOfWork)
         {
             _unitOfWork = unitOfWork;
+            _emailsService = emailsService;
+            _generatePackageService = generatePackageService;
+
+            EntityCreated += OnEntityCreated;
+            EntityUpdated += OnEntityUpdated;
+            EntityDeleted += OnEntityDeleted;
         }
-        public IEnumerable<Package> GetAllPackages() 
+
+        private async void OnEntityCreated(Package package)
         {
-            return _unitOfWork.PackageRepository.GetAll()
-                .Select(x => new Package
-                {
-                    IdPackage = x.IdPackage,
-                    Name = x.Name,
-                    BarcodePackage = x.BarcodePackage,
-                    SentAddress = x.SentAddress,
-                    DestinationAddress = x.DestinationAddress
-                }).ToList();
+            await SendEmailNotification(package.Email, "Package Created", $"A new package with the Barcode {package.BarcodePackage} has been created.");
         }
-        public void Create(Package package) 
+
+        private async void OnEntityUpdated(Package package)
         {
-            var existsPackage = _unitOfWork.PackageRepository.GetByBarcode(package.BarcodePackage);
-            if (existsPackage != null) 
+            await SendEmailNotification(package.Email, "Package Updated", $"Package with the Barcode {package.BarcodePackage} has been updated.");
+
+            if (package.Status == PackageStatus.Transported)
             {
-                throw new Exception("There is an excisting package with this bacode");
+                await SendEmailNotification(package.Email, "Package Delivered", $"Package with the Barcode {package.BarcodePackage} has been delivered.");
             }
-            _unitOfWork.PackageRepository.Add(new DAL.Entities.Package
-                {
-                Name = package.Name,
-                BarcodePackage = package.BarcodePackage,
-                SentAddress = package.SentAddress,
-                DestinationAddress = package.DestinationAddress
-            });
-            _unitOfWork.Commit();
         }
 
-        public void Delete(int id) 
+        private async void OnEntityDeleted(Package package)
         {
-            _unitOfWork.PackageRepository.DeleteById(id);
-            _unitOfWork.Commit();
+            await SendEmailNotification(package.Email, "Package Deleted", $"Package with ID {package.Id} has been deleted.");
         }
-  
-        public Package GetById(int id) 
+
+        private async Task SendEmailNotification(string userEmail, string subject, string body)
         {
-            var package = _unitOfWork.PackageRepository.GetById(id) ?? throw new Exception("There is no Package with this ID");
-            return new Package
+            try
             {
-                IdPackage = package.IdPackage,
-                Name = package.Name,
-                BarcodePackage = package.BarcodePackage,
-                SentAddress = package.SentAddress,
-                DestinationAddress = package.DestinationAddress
-            };
+                await _emailsService.SendEmailAsync(userEmail, subject, body);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to send email notification: {ex.Message}");
+            }
         }
 
-        public void Update(int id, PackageAddModel model)
+        public async Task<IEnumerable<Package>> GetAllPackages()
         {
-            var package = _unitOfWork.PackageRepository.GetById(id);
-            package.Name = model.Name;
-            package.BarcodePackage = model.BarcodePackage;
-            package.SentAddress = model.SentAddress;
-            package.DestinationAddress = model.DestinationAddress;
-            _unitOfWork.Commit();
+            var packages = await _unitOfWork.PackageRepository.GetAll();
+
+            return packages.Select(x => new Package
+            {
+                Id = x.Id,
+                Name = x.Name,
+                BarcodePackage = x.BarcodePackage,
+                SenderInformation = x.SenderInformation,
+                Email = x.Email,
+                SentAddress = x.SentAddress,
+                SentZipCode = x.SentZipCode,
+                DestinationAddress = x.DestinationAddress,
+                DestinationZipCode = x.DestinationZipCode,
+                Status = x.Status
+            });
+        }
+
+        public async Task<List<PackageAddModel>> GetPackageByBarcode(string barcode)
+        {
+            return (await _unitOfWork.PackageRepository
+                              .FindByBarcode(barcode))
+                              .Select(x => new PackageAddModel
+                              {
+                                  Id = x.Id,
+                                  Name = x.Name,
+                                  BarcodePackage = x.BarcodePackage,
+                                  SenderInformation = x.SenderInformation,
+                                  Email = x.Email,
+                                  SentAddress = x.SentAddress,
+                                  SentZipCode = x.SentZipCode,
+                                  DestinationAddress = x.DestinationAddress,
+                                  DestinationZipCode = x.DestinationZipCode,
+                                  Status = x.Status
+                              })
+                              .ToList();
+        }
+
+        public async Task<List<PackageAddModel>> GetPackageByZipCode(string zipCode)
+        {
+            return (await _unitOfWork.PackageRepository
+                                      .FindByZipCode(zipCode))
+                                      .Select(x => new PackageAddModel
+                                      {
+                                          Id = x.Id,
+                                          Name = x.Name,
+                                          BarcodePackage = x.BarcodePackage,
+                                          SenderInformation = x.SenderInformation,
+                                          Email = x.Email,
+                                          SentAddress = x.SentAddress,
+                                          SentZipCode = x.SentZipCode,
+                                          DestinationAddress = x.DestinationAddress,
+                                          DestinationZipCode = x.DestinationZipCode,
+                                          Status = x.Status
+                                      })
+                                      .ToList();
+        }
+
+        public async Task CreateAsync(Package model)
+        {
+            var existingByBarcode = await _unitOfWork.PackageRepository.ExistsByBarcode(model.BarcodePackage);
+            if (existingByBarcode)
+            {
+                throw new DeliverySystemException("There is an existing package with this barcode");
+            }
+
+            var newPackage = new DAL.Entities.Package
+            {
+                Name = model.Name,
+                BarcodePackage = model.BarcodePackage,
+                SenderInformation = model.SenderInformation,
+                Email = model.Email,
+                SentAddress = model.SentAddress,
+                SentZipCode = model.SentZipCode,
+                DestinationAddress = model.DestinationAddress,
+                DestinationZipCode = model.DestinationZipCode,
+                Status = model.Status
+            };
+
+            await _unitOfWork.PackageRepository.AddAsync(newPackage);
+            await _unitOfWork.CommitAsync();
+
+            await _generatePackageService.RemoveGeneratedPackageAsync(model.Id);
+        }
+
+        public async Task UpdatePackageStatusAsync(int packageId, PackageStatus status)
+        {
+            var package = await _unitOfWork.PackageRepository.GetByIdAsync(packageId);
+            if (package == null)
+            {
+                throw new DeliverySystemException("Package not found");
+            }
+
+            package.Status = status;
+            await _unitOfWork.CommitAsync();
         }
     }
 }

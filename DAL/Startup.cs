@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using DAL.Repositories;
+using DAL.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace DAL
 {
@@ -11,6 +12,10 @@ namespace DAL
         {
             services.AddDbContext<DeliverySystemContext>(options => options.UseSqlServer(configuration.GetConnectionString("DeliverySystemConnectionString")));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddIdentity<User, Role>(options => options.SignIn.RequireConfirmedAccount = true)
+                    .AddDefaultUI()
+                    .AddDefaultTokenProviders()
+                    .AddEntityFrameworkStores<DeliverySystemContext>();
         }
 
     }

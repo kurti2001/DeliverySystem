@@ -1,18 +1,26 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DAL.Entities
 {
     [Table("Packages")]
-    public class Package
+    public class Package : BaseEntity
     {
-        [Key,DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int IdPackage { get; set; }
-        [Required]
         public string Name { get; set; }
-        public int BarcodePackage { get; set; }
-        public string SentAddress { get; set; }
+        public string BarcodePackage { get; set; }
+        public string SenderInformation { get; set; }
+        public string Email { get; set; }
         public string DestinationAddress { get; set; }
-        public List<Shipment> Shipments { get; set; }
+        public int DestinationZipCode { get; set; }
+        public string SentAddress { get; set; }
+        public int SentZipCode { get; set; }
+        public PackageStatus Status { get; set; }
+    }
+
+    public enum PackageStatus
+    {
+        Created,
+        Transported,
+        Accepted,
+        Rejected
     }
 }

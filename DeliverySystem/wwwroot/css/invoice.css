@@ -1,0 +1,64 @@
+﻿body {
+    font-family: 'Arial', sans-serif;
+    margin: 20px;
+    padding: 0;
+}
+
+.receipt-box {
+    max-width: 600px;
+    margin: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.receipt-header img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: auto;
+}
+
+.receipt-info {
+    text-align: right;
+}
+
+    .receipt-info p {
+        margin: 5px 0;
+    }
+
+.item-details {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+}
+
+    .item-details th, .item-details td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    .item-details th {
+        background-color: #f2f2f2;
+    }
+
+.receipt-footer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Styling for the Save button */
+.save-button {
+    background-color: #3498db;
+    color: #fff;
+    padding: 15px 30px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .save-button:hover {
+        background-color: #2980b9;
+    }

@@ -1,5 +1,8 @@
 ﻿using BLL.Services;
+using DinkToPdf.Contracts;
+using DinkToPdf;
 using Microsoft.Extensions.DependencyInjection;
+using BLL.Singleton;
 
 namespace BLL
 {
@@ -9,7 +12,14 @@ namespace BLL
         {
             services.AddScoped<IPackageService, PackageService>();
             services.AddScoped<IPostalOfficeService, PostalOfficeService>();
-            services.AddScoped<IRecepsionistService, RecepsionistService>();
+            services.AddScoped<IGeneratePackageService, GeneratePackageService>();
+            services.AddScoped<IAreaService, AreaService>();
+            services.AddScoped<IEmailsService, EmailsService>();
+
+            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+            services.AddSingleton<ILoggerService, LoggerService>();
+
         }
+
     }
 }

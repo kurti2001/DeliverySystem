@@ -1,57 +1,109 @@
-﻿using DAL.Repositories;
-
-namespace DAL;
-
-public interface IUnitOfWork
+﻿using DAL.Entities;
+using DAL.Repositories;
+using Microsoft.EntityFrameworkCore.Storage;
+namespace DAL
 {
-    #region Repositories
-    IPackageRepository PackageRepository { get; }
-    IRecepsionistRepository RecepsionistRepository { get; }
-    IPostalOfficeRepository PostalOfficeRepository { get; }
-    #endregion
+    public interface IUnitOfWork
+    {
+        IBaseRepository<TEntity, TKey> GetRepository<TEntity, TKey>() 
+            where TEntity : BaseEntity<TKey>;
 
-    void Commit();
-}
+        #region Repositories
+        IAreaRepository AreaRepository { get; }
+        IGeneratePackageRepository GeneratePackageRepository { get; }
+        IPackageRepository PackageRepository { get; }
+        IPostalOfficeRepository PostalOfficeRepository { get; }
+        #endregion
 
-internal class UnitOfWork : IUnitOfWork
-{
-    private readonly DeliverySystemContext _dbContext;
-    public UnitOfWork(DeliverySystemContext context)
-    {
-        _dbContext = context;
-        _packageRepository = new PackageRepository(context);
-        _recepsionistRepository = new RecepsionistRepository(context);
-        _postalofficeRepository = new PostalOfficeRepository(context);
+        void Commit();
+        Task CommitAsync();
+        IDbContextTransaction BeginTransaction();
     }
-    private IPackageRepository _packageRepository;
-    public IPackageRepository PackageRepository
+
+    internal class UnitOfWork : IUnitOfWork
     {
-        get
+        private readonly DeliverySystemContext _dbContext;
+        private IAreaRepository _areaRepository;
+        private IPackageRepository _packageRepository;
+        private IPostalOfficeRepository _postalofficeRepository;
+        private IGeneratePackageRepository _generatePackageRepository;
+
+        public UnitOfWork(DeliverySystemContext context)
         {
-            _packageRepository ??= new PackageRepository(_dbContext);
-            return _packageRepository;
+            _dbContext = context;
         }
-    }
-    private IRecepsionistRepository _recepsionistRepository;
-    public IRecepsionistRepository RecepsionistRepository
-    {
-        get 
+
+        public IBaseRepository<TEntity, TKey> GetRepository<TEntity, TKey>() where TEntity : BaseEntity<TKey>
         {
-            _recepsionistRepository ??= new RecepsionistRepository(_dbContext);
-            return _recepsionistRepository;
+            if (typeof(TEntity) == typeof(Area))
+            {
+                return AreaRepository as IBaseRepository<TEntity, TKey>;
+            }
+            else if (typeof(TEntity) == typeof(Package))
+            {
+                return PackageRepository as IBaseRepository<TEntity, TKey>;
+            } 
+            else if (typeof(TEntity) == typeof(PostalOffice))
+            {
+                return PostalOfficeRepository as IBaseRepository<TEntity, TKey>;
+            }
+            else if (typeof(TEntity) == typeof(GeneratePackage))
+            {
+                return GeneratePackageRepository as IBaseRepository<TEntity, TKey>;
+            }
+
+            throw new ArgumentException($"Repository for type {typeof(TEntity)} not found");
         }
-    }
-    private IPostalOfficeRepository _postalofficeRepository;
-    public IPostalOfficeRepository PostalOfficeRepository
-    {
-        get
+
+        public IDbContextTransaction BeginTransaction()
         {
-            _postalofficeRepository ??= new PostalOfficeRepository(_dbContext);
-            return _postalofficeRepository;
+            return _dbContext.Database.BeginTransaction();
         }
-    }
-    public void Commit() 
-    {
-        _dbContext.SaveChanges();
+
+        public void Commit()
+        {
+            _dbContext.SaveChanges();
+        }
+
+        public async Task CommitAsync()
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public IAreaRepository AreaRepository
+        {
+            get
+            {
+                _areaRepository ??= new AreaRepository(_dbContext);
+                return _areaRepository;
+            }
+        }
+
+        public IPackageRepository PackageRepository
+        {
+            get
+            {
+                _packageRepository ??= new PackageRepository(_dbContext);
+                return _packageRepository;
+            }
+        }
+
+        public IPostalOfficeRepository PostalOfficeRepository
+        {
+            get
+            {
+                _postalofficeRepository ??= new PostalOfficeRepository(_dbContext);
+                return _postalofficeRepository;
+            }
+        }
+
+        public IGeneratePackageRepository GeneratePackageRepository
+        {
+            get
+            {
+                _generatePackageRepository ??= new GeneratePackageRepository(_dbContext);
+                return _generatePackageRepository;
+            }
+        }
     }
 }

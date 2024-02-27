@@ -1,0 +1,33 @@
+﻿@model DAL.Entities.Area
+
+@{
+    ViewData["Title"] = "Details";
+}
+    <div class="container mt-4">
+
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Area Details</h4>
+                <hr />
+                <dl class="row">
+                @if (User.IsInRole("Admin"))
+                {
+                    <dt class="col-sm-3 text-muted">ID:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Id)</dd>
+                }
+                <dt class="col-sm-3 text-muted">Name:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Name)</dd>
+
+                    <dt class="col-sm-3 text-muted">Zip Code:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.ZipCode)</dd>
+
+                    <dt class="col-sm-3 text-muted">Area Information:</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.AreaInformation)</dd>
+                </dl>
+                <div class="mt-3">
+                    <a asp-action="Edit" class="btn btn-primary">Edit</a>
+                    <a asp-action="Index" class="btn btn-secondary ml-2">Back to List</a>
+                </div>
+            </div>
+        </div>
+    </div>

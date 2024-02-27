@@ -1,0 +1,62 @@
+﻿@model DAL.Entities.PostalOffice
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="container mt-4">
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Postal Office Details</h4>
+            <hr />
+    <dl class="row">
+                @if (User.IsInRole("Admin"))
+                {
+                    <dt class="col-sm-10">
+                        @Html.DisplayNameFor(model => model.Id)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Id)
+                    </dd>
+        }
+        <dt class="col-sm-10">
+            @Html.DisplayNameFor(model => model.OfficeName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.OfficeName)
+        </dd>
+        <dt class="col-sm-10">
+            @Html.DisplayNameFor(model => model.Location)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Location)
+        </dd>
+        <dt class="col-sm-10">
+            @Html.DisplayNameFor(model => model.Address)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+        <dt class="col-sm-10">
+            @Html.DisplayNameFor(model => model.PhoneNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PhoneNumber)
+        </dd>
+        @if (User.IsInRole("Admin"))
+                {
+                    <dt class="col-sm-10">
+                        @Html.DisplayNameFor(model => model.AreaId)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.AreaId)
+        </dd>
+        }
+    </dl>
+            <div class="mt-3">
+                <a asp-action="Edit" class="btn btn-primary">Edit</a>
+                <a asp-action="Index" class="btn btn-secondary ml-2">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>

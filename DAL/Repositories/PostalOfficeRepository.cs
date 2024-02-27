@@ -3,40 +3,32 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DAL.Repositories
 {
-    public interface IPostalOfficeRepository
+    public interface IPostalOfficeRepository : IBaseRepository<PostalOffice, int>
     {
-        void Add(PostalOffice postalOffice);
-        PostalOffice GetById(int id);
+        Task<IEnumerable<PostalOffice>> GetAll();
         PostalOffice GetByName(string name);
-        void DeleteById(int id);
-        IEnumerable<PostalOffice> GetAll();
+        IQueryable<PostalOffice> GetByAreaId(int areaId);
+
     }
-    internal class PostalOfficeRepository : IPostalOfficeRepository
+    internal class PostalOfficeRepository : BaseRepository<PostalOffice, int>, IPostalOfficeRepository
     {
-        private readonly DbSet<PostalOffice> _dbSet;
-        public PostalOfficeRepository(DeliverySystemContext dbContext)
+        public PostalOfficeRepository(DeliverySystemContext dbContext) : base(dbContext)
         {
-            _dbSet = dbContext.Set<PostalOffice>();
         }
-        public void Add(PostalOffice postalOffice) 
+        public async Task<IEnumerable<PostalOffice>> GetAll()
         {
-            _dbSet.Add(postalOffice);
-        }
-        public PostalOffice GetById(int id) 
-        {
-            return _dbSet.Find(id);
+            return await _dbSet.ToListAsync();
         }
         public PostalOffice GetByName(string name)
         {
             return _dbSet.FirstOrDefault(x => x.OfficeName.ToLower() == name.ToLower());
         }
-        public void DeleteById(int id) 
+
+        public IQueryable<PostalOffice> GetByAreaId(int areaId)
         {
-            _dbSet.Remove(GetById(id));
+            return _noTrackingDbSet.Where(x => x.AreaId == areaId);
         }
-        public IEnumerable<PostalOffice> GetAll() 
-        {
-            return _dbSet.ToList();
-        }
+
+
     }
 }
